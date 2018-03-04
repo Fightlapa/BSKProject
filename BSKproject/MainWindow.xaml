@@ -7,6 +7,12 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        
+        <Menu x:Name="menu" HorizontalAlignment="Left" Height="22" VerticalAlignment="Top" Width="518">
+            <MenuItem Header="MenuItem"/>
+            <MenuItem Header="MenuItem"/>
+            <MenuItem Header="MenuItem"/>
+            <MenuItem Header="MenuItem"/>
+        </Menu>
+
     </Grid>
 </Window>
