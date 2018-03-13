@@ -8,11 +8,17 @@
         Title="MainWindow" Height="350" Width="525">
     <Grid>
         <Menu x:Name="menu" HorizontalAlignment="Left" Height="22" VerticalAlignment="Top" Width="518">
-            <MenuItem Header="MenuItem"/>
-            <MenuItem Header="MenuItem"/>
-            <MenuItem Header="MenuItem"/>
-            <MenuItem Header="MenuItem"/>
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open" Click="MenuItem_Open_Click" />
+                <MenuItem Header="_Choose Output Directory" Click="MenuItem_Choose_Click" />
+            </MenuItem>
+            <MenuItem Header="_Mode">
+                <RadioButton x:Name="radioButton_ECB" Content="ECB" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="radioButton_Checked"/>
+                <RadioButton x:Name="radioButton_CBC" Content="CBC" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <RadioButton x:Name="radioButton_CFB" Content="CFB" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <RadioButton x:Name="radioButton_OFB" Content="OFB" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            </MenuItem>
         </Menu>
-
+        <ProgressBar Minimum="0" Maximum="100" Value="75" Name="pbStatus" Margin="131,65,126,196" />
     </Grid>
 </Window>
