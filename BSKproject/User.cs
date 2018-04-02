@@ -13,7 +13,7 @@ namespace BSKproject
         /// <summary>
         /// Encrypted AES key by user RSA public key.
         /// </summary>
-        private byte[] key;
+        public byte[] key;
 
         public string Name
         {
@@ -37,11 +37,13 @@ namespace BSKproject
         /// Writes user form xml file.
         /// </summary>
         /// <param name="output">Opened xml file</param>
-        public void WriteToXml(XmlWriter output)
+        public void WriteToXml(XmlWriter output, byte[] key)
         {
             output.WriteStartElement("User");
 
             output.WriteElementString("Username", name);
+
+            key = RSA.Encrypte(key,name);
             string keyConverted = string.Join(".", new List<byte>(key).ConvertAll(i => ((int)i).ToString()).ToArray());
             output.WriteElementString("Key", keyConverted);
 

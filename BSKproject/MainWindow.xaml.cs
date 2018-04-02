@@ -26,9 +26,6 @@ namespace BSKproject
     public partial class MainWindow : Window
     {
         #region field
-        //hardcore 128 for now
-        private int blockSize = 128;
-        private int keySize = 32;
         AES aes;
         /// <summary>
         /// List of approved users.
@@ -36,6 +33,7 @@ namespace BSKproject
         List<string> users = new List<string>();
         string outputPath;
         string inputPath;
+        string loggedUser;
 
         static Random random = new Random();
         //
@@ -120,8 +118,6 @@ namespace BSKproject
         }
 
 
-
-
         private async void Cypher_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -144,7 +140,7 @@ namespace BSKproject
                 }
                 const int Iterations = 300;
                 var keyGenerator = new Rfc2898DeriveBytes(basePassword, salt1, Iterations);
-                aes.key = keyGenerator.GetBytes(keySize);
+                aes.key = keyGenerator.GetBytes(aes.keySize);
 
                 keyGenerator = new Rfc2898DeriveBytes(basePassword.Reverse().ToString(), salt1, Iterations);
                 aes.iV = keyGenerator.GetBytes(16);
@@ -164,7 +160,7 @@ namespace BSKproject
                     {
                         xmlOutput.WriteStartDocument();
 
-                        FilesManager.WriteToXml(xmlOutput, keySize, blockSize, aes.cipherMode, aes.iV, aes.recipentsList);
+                        FilesManager.WriteToXml(xmlOutput, aes);
 
                         xmlOutput.Flush();
 
@@ -198,18 +194,6 @@ namespace BSKproject
             }
         }
 
-        //private void StartUpdatingprogress(FileStream source, Task copyTask)
-        //{
-        //    long length = source.Length;
-        //    do
-        //    {
-        //        double position = (double)source.Position;
-        //        pbStatus.Value = (position / length) * 100;
-        //    }
-        //    while (!copyTask.IsCompleted);
-        //    pbStatus.Value = 100;
-        //}
-
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -233,6 +217,73 @@ namespace BSKproject
                 }
             }
 
+        }
+
+        private async void Decypher_Click(object sender, RoutedEventArgs e)
+        {
+            string tempFile = System.IO.Path.GetTempFileName();
+
+            using (var input = File.OpenRead(inputPath))
+            {
+                using (var reader = XmlReader.Create(input))
+                {
+                    aes = FilesManager.FromXml(reader, aes);
+
+                    using (var output = File.OpenWrite(tempFile))
+                    {
+                        input.Position = (reader as IXmlLineInfo).LinePosition + "</Header>".Length;//Set proper position beacues xmlReader loads to much
+
+                        Task copyTask = input.CopyToAsync(output);
+
+                        //new Thread(() => StartUpdatingprogress(source, copyTask)).Start();
+                        long length = input.Length;
+                        do
+                        {
+                            double position = (double)input.Position;
+                            pbStatus.Value = (position / length) * 100;
+                        }
+                        while (!copyTask.IsCompleted);
+                        pbStatus.Value = 100;
+
+                        copyTask.Wait();
+                    }
+                }
+            }
+                
+            using (var input = File.OpenRead(tempFile))
+            {
+                using (var decryptedStream = aes.DecrypteStream(input, loggedUser, "Test"))
+                {
+                    using (var output = File.OpenWrite(outputPath))
+                    {
+                        Task copyTask = decryptedStream.CopyToAsync(output);
+
+                        //new Thread(() => StartUpdatingprogress(source, copyTask)).Start();
+                        long length = input.Length;
+                        do
+                        {
+                            double position = (double)input.Position;
+                            pbStatus.Value = (position / length) * 100;
+                        }
+                        while (!copyTask.IsCompleted);
+                        pbStatus.Value = 100;
+
+                        await copyTask;
+                    }
+                }
+            }
+
+        }
+
+        private void LogIn_Click(object sender, RoutedEventArgs e)
+        {
+            loggedUser = LoginNickname.Text;
+        }
+
+        private void comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBoxItem typeItem = (ComboBoxItem)comboBox.SelectedItem;
+            aes.blockSize = Int32.Parse((string)typeItem.Content);
         }
     }
 }

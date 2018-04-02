@@ -26,6 +26,13 @@
         <Button x:Name="SubmitUser" Content="SubmitUser" HorizontalAlignment="Left" Margin="301,240,0,0" VerticalAlignment="Top" Width="75" Click="SubmitUser_Click"/>
         <ListBox x:Name="userList" HorizontalAlignment="Left" Height="100" Margin="85,182,0,0" VerticalAlignment="Top" Width="100"/>
         <Button x:Name="addRecipent" Content="Add Recipent" HorizontalAlignment="Left" Margin="210,189,0,0" VerticalAlignment="Top" Width="75" Click="addRecipent_Click"/>
-        <Button x:Name="decypher" Content="Decypher" HorizontalAlignment="Left" Margin="47,102,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.24,0.227"/>
+        <Button x:Name="Decypher" Content="Decypher" HorizontalAlignment="Left" Margin="47,102,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.24,0.227" Click="Decypher_Click"/>
+        <TextBox x:Name="LoginNickname" HorizontalAlignment="Left" Height="23" Margin="210,287,0,0" TextWrapping="Wrap" Text="Login" VerticalAlignment="Top" Width="120"/>
+        <Button x:Name="LogIn" Content="Login" HorizontalAlignment="Left" Margin="346,287,0,0" VerticalAlignment="Top" Width="75" Click="LogIn_Click"/>
+        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="85,140,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="comboBox_SelectionChanged" >
+            <ComboBoxItem >64</ComboBoxItem>
+            <ComboBoxItem >128</ComboBoxItem>
+            <ComboBoxItem >256</ComboBoxItem>
+        </ComboBox>
     </Grid>
 </Window>

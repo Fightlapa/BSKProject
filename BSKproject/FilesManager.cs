@@ -12,37 +12,35 @@ namespace BSKproject
     class FilesManager
     {
 
-        static public void WriteToXml(XmlWriter output, int keySize, int blockSize, CipherMode cipherMode, byte[] iV, List<User> users)
+        static public void WriteToXml(XmlWriter output, AES aes)
         {
             output.WriteStartElement("Header");
 
-            output.WriteElementString("KeySize", keySize.ToString());
-            output.WriteElementString("BlockSize", blockSize.ToString());
-            output.WriteElementString("CipherMode", cipherMode.ToString());
+            output.WriteElementString("KeySize", aes.keySize.ToString());
+            output.WriteElementString("BlockSize", aes.blockSize.ToString());
+            output.WriteElementString("CipherMode", aes.cipherMode.ToString());
 
-            string iVConverted = string.Join(".", new List<byte>(iV).ConvertAll(i => ((int)i).ToString()).ToArray());
+            string iVConverted = string.Join(".", new List<byte>(aes.iV).ConvertAll(i => ((int)i).ToString()).ToArray());
 
             output.WriteElementString("IV", iVConverted);
 
             output.WriteStartElement("Users");
-            foreach (User user in users)
+            foreach (User user in aes.recipentsList)
             {
-                user.WriteToXml(output);
+                user.WriteToXml(output, aes.key);
             }
 
             output.WriteEndElement();
             output.WriteEndElement();
         }
 
-        public AES FromXml(XmlReader reader, int keySize, int blockSize, CipherMode cipherMode, byte[] iV, List<User> users)
+        static public AES FromXml(XmlReader reader, AES aes)
         {
-            AES aes = new AES();
             reader.ReadToFollowing("KeySize");
-            keySize = reader.ReadElementContentAsInt();
 
-            blockSize = reader.ReadElementContentAsInt();
+            aes.keySize = reader.ReadElementContentAsInt();
 
-            aes = new AES();
+            aes.blockSize = reader.ReadElementContentAsInt();
 
             aes.cipherMode = AES.CipherFromString(reader.ReadElementContentAsString());
 
@@ -54,7 +52,7 @@ namespace BSKproject
                 if (reader.NodeType == XmlNodeType.Element && reader.Name == "User")
                 {
                     var user = User.FromXml(reader);
-                    users.Add(user);
+                    aes.recipentsList.Add(user);
                 }
                 else if (reader.NodeType == XmlNodeType.EndElement && reader.Name == "Header")
                 {

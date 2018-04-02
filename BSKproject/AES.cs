@@ -13,6 +13,9 @@ namespace BSKproject
         public CipherMode cipherMode;
         public byte[] key;
         public byte[] iV;
+        //hardcore 128 for now
+        public int blockSize = 128;
+        public int keySize = 32;
         public List<User> recipentsList = new List<User>();
 
         public CryptoStream EncrypteStream(Stream stream)
@@ -25,6 +28,21 @@ namespace BSKproject
             ICryptoTransform encryptor = myAes.CreateEncryptor();
 
             return new CryptoStream(stream, encryptor, CryptoStreamMode.Read);
+        }
+
+        public CryptoStream DecrypteStream(Stream stream, string userName, string keyPharse)
+        {
+            AesManaged myAes = new AesManaged();
+            myAes.Mode = cipherMode;
+            myAes.IV = iV;
+            var user = (from u in recipentsList
+                        where u.Name.Equals(userName)
+                        select u).FirstOrDefault();
+            myAes.Key = user.LoadKey(keyPharse);
+
+            ICryptoTransform decryptor = myAes.CreateDecryptor();
+
+            return new CryptoStream(stream, decryptor, CryptoStreamMode.Read);
         }
 
 
