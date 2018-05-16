@@ -10,6 +10,10 @@ namespace BSKproject
 {
     class RSA
     {
+        // Pobiera klucze z odpowiednich folderów
+        // zczytuje public key z xmla w pliku z public keyem
+        //  ustawia rsa z xmla z odpowiednim kluczem publicznym
+        // potem zapisuje dane
 
         public static byte[] Encrypte(byte[] data, string username)
         {
@@ -27,6 +31,10 @@ namespace BSKproject
             return rsa.Encrypt(data, true);
         }
 
+        // Pobiera klucze z odpowiednich folderów
+        // zczytuje private key z xmla w pliku z pirvate keyem
+        //  ustawia rsa z xmla z odpowiednim kluczem prywatnym
+        // potem odczytuje dane z odpowiednim kluczem
         public static byte[] Decrypte(byte[] key, string username, string keyPharse)
         {
             var rsa = new RSACryptoServiceProvider();

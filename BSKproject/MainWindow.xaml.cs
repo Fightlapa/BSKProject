@@ -31,8 +31,9 @@ namespace BSKproject
         /// List of approved users.
         /// </summary>
         List<string> users = new List<string>();
-        string outputPath;
-        string inputPath;
+        List<string> pendingRecipents = new List<string>();
+        string outputPath = "";
+        string inputPath = "";
         string loggedUser;
 
         static Random random = new Random();
@@ -45,6 +46,7 @@ namespace BSKproject
         {
             InitializeComponent();
             aes = new AES();
+            aes.cipherMode = CipherMode.CBC;
         }
 
         private void CBC_Checked(object sender, RoutedEventArgs e)
@@ -122,6 +124,27 @@ namespace BSKproject
         {
             try
             {
+                if (inputPath == "")
+                {
+                    MessageBox.Show("No input file specified", "Error", MessageBoxButton.OK);
+                }
+
+                if (outputPath == "")
+                {
+                    MessageBox.Show("No output file specified", "Error", MessageBoxButton.OK);
+                }
+
+                if (aes.cipherMode == 0)
+                {
+                    MessageBox.Show("No cipher mode specified", "Error", MessageBoxButton.OK);
+                }
+
+                if (pendingRecipents == null || pendingRecipents.Count == 0)
+                {
+                    MessageBox.Show("No Recipient was assigned", "Error", MessageBoxButton.OK);
+                    return;
+                }
+
                 FileInfo info = new FileInfo(Path.GetTempFileName());
                 int randomValue;
 
@@ -145,13 +168,12 @@ namespace BSKproject
                 keyGenerator = new Rfc2898DeriveBytes(basePassword.Reverse().ToString(), salt1, Iterations);
                 aes.iV = keyGenerator.GetBytes(16);
 
-
-
-                if (aes.recipentsList == null || aes.recipentsList.Count == 0)
+                foreach (string nickname in pendingRecipents)
                 {
-                    MessageBox.Show("No Recipient was assigned", "Error", MessageBoxButton.OK);
-                    return;
+                    aes.addUser(nickname);
                 }
+
+
 
                 using (var output = File.Open(outputPath, FileMode.Create))
                 {
@@ -213,7 +235,7 @@ namespace BSKproject
             {
                 if (user == (string)userList.SelectedItem)
                 {
-                    aes.addUser(user);
+                    this.pendingRecipents.Add(user);
                 }
             }
 
