@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace BSKproject
 {
@@ -83,9 +85,13 @@ namespace BSKproject
         /// Shows the dialog for pharse input.
         /// </summary>
         /// <returns></returns>
-        internal byte[] LoadKey(string keyPharse)
+        internal byte[] LoadKey(string keyPhrase)
         {
-            return RSA.Decrypte(this.key, this.name, keyPharse);
+            using (MD5 md5Hash = MD5.Create())
+            {
+                byte[] keyPharseHash = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(keyPhrase));
+                return RSA.Decrypte(this.key, this.name, keyPharseHash);
+            }
         }
 
 

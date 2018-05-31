@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace BSKproject
 {
@@ -30,15 +31,50 @@ namespace BSKproject
             return new CryptoStream(stream, encryptor, CryptoStreamMode.Read);
         }
 
-        public CryptoStream DecrypteStream(Stream stream, string userName, string keyPharse)
+        public CryptoStream EncrypteStream(Stream stream, byte[] password)
+        {
+            AesManaged myAes = new AesManaged();
+            myAes.Mode = cipherMode;
+            myAes.IV = new byte[16];
+            myAes.Key = password;
+            myAes.BlockSize = this.blockSize;
+
+            ICryptoTransform encryptor = myAes.CreateEncryptor();
+
+            return new CryptoStream(stream, encryptor, CryptoStreamMode.Write);
+        }
+
+        public CryptoStream DecrypteStream(Stream stream, string login, string keyPharse)
         {
             AesManaged myAes = new AesManaged();
             myAes.Mode = cipherMode;
             myAes.IV = iV;
             var user = (from u in recipentsList
-                        where u.Name.Equals(userName)
+                        where u.Name.Equals(login)
                         select u).FirstOrDefault();
-            myAes.Key = user.LoadKey(keyPharse);
+            if (user == null)
+            {
+                MessageBox.Show("User not in recipents!", "Error", MessageBoxButton.OK);
+                return null;
+            }
+            byte[] aesKey = user.LoadKey(keyPharse);
+            if (aesKey == null)
+            {
+                return null;
+            }
+            myAes.Key = aesKey;
+
+            ICryptoTransform decryptor = myAes.CreateDecryptor();
+
+            return new CryptoStream(stream, decryptor, CryptoStreamMode.Read);
+        }
+
+        public CryptoStream DecrypteStream(Stream stream, byte[] password)
+        {
+            AesManaged myAes = new AesManaged();
+            myAes.Mode = cipherMode;
+            myAes.IV = new byte[16];
+            myAes.Key = password;
 
             ICryptoTransform decryptor = myAes.CreateDecryptor();
 

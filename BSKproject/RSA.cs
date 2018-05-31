@@ -5,15 +5,12 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace BSKproject
 {
     class RSA
     {
-        // Pobiera klucze z odpowiednich folderów
-        // zczytuje public key z xmla w pliku z public keyem
-        //  ustawia rsa z xmla z odpowiednim kluczem publicznym
-        // potem zapisuje dane
 
         public static byte[] Encrypte(byte[] data, string username)
         {
@@ -31,28 +28,43 @@ namespace BSKproject
             return rsa.Encrypt(data, true);
         }
 
-        // Pobiera klucze z odpowiednich folderów
-        // zczytuje private key z xmla w pliku z pirvate keyem
-        //  ustawia rsa z xmla z odpowiednim kluczem prywatnym
-        // potem odczytuje dane z odpowiednim kluczem
-        public static byte[] Decrypte(byte[] key, string username, string keyPharse)
+        public static byte[] Decrypte(byte[] key, string username, byte[] keyPharse)
         {
             var rsa = new RSACryptoServiceProvider();
 
             string privatePath = Path.Combine(Constants.KEY_FOLDER_PATH, Constants.PRIVATE_KEY_FOLDER, username);
             string privateKeyFile = Path.Combine(privatePath, Constants.PRIVATE_KEY_FILENAME);
 
-            using (var reader = new StreamReader(privateKeyFile))
+            using (var inputStream = File.OpenRead(privateKeyFile))
             {
-                string input = reader.ReadToEnd();
-                rsa.FromXmlString(input);
+                var aes = new AES();
+                aes.cipherMode = CipherMode.ECB;
+                aes.blockSize = 128;
+                aes.keySize = 256;
+                using (var streamdecrypted = aes.DecrypteStream(inputStream, keyPharse))
+                {
+                    try
+                    {
+                        using (var input = new StreamReader(streamdecrypted))
+                        {
+                            string inputText = input.ReadToEnd();
+                            rsa.FromXmlString(inputText);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Wrong password", "Error", MessageBoxButton.OK);
+                        return null;
+                    }
+
+                }
             }
 
             return rsa.Decrypt(key, true);
 
         }
 
-        public static void GenerateKey(string username, string keyPharse)
+        public static void GenerateKey(string username, byte[] keyPharse)
         {
             User user = new User(username);
             var rsa = new RSACryptoServiceProvider();
@@ -81,10 +93,20 @@ namespace BSKproject
                 file.Write(publicKey);
             }
 
-            using (var file = new StreamWriter(privateKeyFile))
+            using (var file = File.OpenWrite(privateKeyFile))
             {
-                string privateKey = rsa.ToXmlString(true);
-                file.Write(privateKey);
+                var aes = new AES();
+                aes.cipherMode = CipherMode.ECB;
+                aes.blockSize = 128;
+                aes.keySize = 256;
+                using (var fileOutput = aes.EncrypteStream(file, keyPharse))
+                {
+                    using (var output = new StreamWriter(fileOutput))
+                    {
+                        string privateKey = rsa.ToXmlString(true);
+                        output.Write(privateKey);
+                    }
+                }
             }
         }
     }

@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BSKproject"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        <Menu x:Name="menu" HorizontalAlignment="Left" Height="22" VerticalAlignment="Top" Width="518">
+        Title="MainWindow" Height="400" Width="600" ResizeMode="NoResize">
+    <Grid Width="600" Height="399">
+        <Menu x:Name="menu" HorizontalAlignment="Left" Height="22" VerticalAlignment="Top" Width="594" Margin="0,0,-0.4,0">
             <MenuItem Header="_File" Click="MenuItem_Click">
                 <MenuItem Header="_Open" Click="MenuItem_Open_Click" />
                 <MenuItem Header="_Choose Output Directory" Click="MenuItem_Choose_Click" />
@@ -18,21 +18,32 @@
                 <RadioButton x:Name="radioButton_CFB" Content="CFB" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="CFB_Checked"/>
                 <RadioButton x:Name="radioButton_OFB" Content="OFB" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="OFB_Checked"/>
             </MenuItem>
+            <MenuItem Header="Block size" Height="19" Width="100">
+                <RadioButton x:Name="blockSize64" Content="64" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="blockSize64_Checked"/>
+                <RadioButton x:Name="blockSize128" Content="128" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="blockSize128_Checked"/>
+                <RadioButton x:Name="blockSize256" Content="256" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="blockSize256_Checked"/>
+            </MenuItem>
         </Menu>
-        <ProgressBar Minimum="0" Maximum="100" Value="75" Name="pbStatus" Margin="131,65,126,196" />
-        <Button x:Name="Cypher" Content="Cypher" HorizontalAlignment="Left" Margin="47,66,0,0" VerticalAlignment="Top" Width="75" Click="Cypher_Click"/>
-        <TextBox x:Name="Login" HorizontalAlignment="Left" Height="23" Margin="301,172,0,0" TextWrapping="Wrap" Text="Login" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="Password" HorizontalAlignment="Left" Height="23" Margin="301,200,0,0" TextWrapping="Wrap" Text="Password" VerticalAlignment="Top" Width="120"/>
-        <Button x:Name="SubmitUser" Content="SubmitUser" HorizontalAlignment="Left" Margin="301,240,0,0" VerticalAlignment="Top" Width="75" Click="SubmitUser_Click"/>
-        <ListBox x:Name="userList" HorizontalAlignment="Left" Height="100" Margin="85,182,0,0" VerticalAlignment="Top" Width="100"/>
-        <Button x:Name="addRecipent" Content="Add Recipent" HorizontalAlignment="Left" Margin="210,189,0,0" VerticalAlignment="Top" Width="75" Click="addRecipent_Click"/>
-        <Button x:Name="Decypher" Content="Decypher" HorizontalAlignment="Left" Margin="47,102,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.24,0.227" Click="Decypher_Click"/>
-        <TextBox x:Name="LoginNickname" HorizontalAlignment="Left" Height="23" Margin="210,287,0,0" TextWrapping="Wrap" Text="Login" VerticalAlignment="Top" Width="120"/>
-        <Button x:Name="LogIn" Content="Login" HorizontalAlignment="Left" Margin="346,287,0,0" VerticalAlignment="Top" Width="75" Click="LogIn_Click"/>
-        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="85,140,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="comboBox_SelectionChanged" >
-            <ComboBoxItem >64</ComboBoxItem>
-            <ComboBoxItem >128</ComboBoxItem>
-            <ComboBoxItem >256</ComboBoxItem>
-        </ComboBox>
+        <ProgressBar Minimum="0" Maximum="100" Value="75" Name="pbStatus" Margin="118,87,299,280" />
+        <Button x:Name="Cypher" Content="Cypher" HorizontalAlignment="Left" Margin="29,72,0,0" VerticalAlignment="Top" Width="75" Click="Cypher_Click"/>
+        <TextBox x:Name="Login" HorizontalAlignment="Left" Height="23" Margin="443,214,0,0" TextWrapping="Wrap" Text="Login" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Password" HorizontalAlignment="Left" Height="23" Margin="443,250,0,0" TextWrapping="Wrap" Text="Password" VerticalAlignment="Top" Width="120"/>
+        <Button x:Name="SubmitUser" Content="SubmitUser" HorizontalAlignment="Left" Margin="475,290,0,0" VerticalAlignment="Top" Width="75" Click="SubmitUser_Click"/>
+        <ListBox x:Name="userList" HorizontalAlignment="Left" Height="100" Margin="29,214,0,0" VerticalAlignment="Top" Width="100"/>
+        <Button x:Name="addRecipent" Content="Add Recipent" HorizontalAlignment="Left" Margin="42,167,0,0" VerticalAlignment="Top" Width="75" Click="addRecipent_Click"/>
+        <Button x:Name="Decypher" Content="Decypher" HorizontalAlignment="Left" Margin="29,100,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.24,0.227" Click="Decypher_Click"/>
+        <TextBox x:Name="LoginNickname" HorizontalAlignment="Left" Height="23" Margin="313,214,0,0" TextWrapping="Wrap" Text="Login" VerticalAlignment="Top" Width="89"/>
+        <Button x:Name="LogIn" Content="Login" HorizontalAlignment="Left" Margin="324,287,0,0" VerticalAlignment="Top" Width="75" Click="LogIn_Click" Height="22"/>
+        <TextBox x:Name="LogInPassword" HorizontalAlignment="Left" Height="23" Margin="313,250,0,0" TextWrapping="Wrap" Text="Password" VerticalAlignment="Top" Width="90"/>
+        <Label Content="Logged user:" HorizontalAlignment="Left" Margin="290,182,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="LoggedUserLabel" Content="None" HorizontalAlignment="Left" Margin="373,182,0,0" VerticalAlignment="Top" Width="84"/>
+        <Label Content="Input file:" HorizontalAlignment="Left" Margin="20,24,0,0" VerticalAlignment="Top"/>
+        <Label x:Name ="OutputFileLabel" Content="None" HorizontalAlignment="Left" Margin="89,46,0,0" VerticalAlignment="Top"/>
+        <Label Content="Output file:" HorizontalAlignment="Left" Margin="20,46,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="InputFileLabel" Content="None" HorizontalAlignment="Left" Margin="79,24,0,0" VerticalAlignment="Top"/>
+        <Label Content="Available users" HorizontalAlignment="Left" Margin="29,189,0,0" VerticalAlignment="Top"/>
+        <Label Content="Recipents" HorizontalAlignment="Left" Margin="158,190,0,0" VerticalAlignment="Top"/>
+        <ListBox x:Name="recipentListBox" HorizontalAlignment="Left" Height="100" Margin="134,216,0,0" VerticalAlignment="Top" Width="100"/>
+        <Button x:Name="removeRecipent" Content="Remove Recipent" HorizontalAlignment="Left" Margin="144,166,0,0" VerticalAlignment="Top" Width="75" Click="removeRecipent_Click"/>
     </Grid>
 </Window>

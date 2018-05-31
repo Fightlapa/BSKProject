@@ -38,6 +38,8 @@ namespace BSKproject
         {
             reader.ReadToFollowing("KeySize");
 
+            aes.recipentsList = new List<User>();
+
             aes.keySize = reader.ReadElementContentAsInt();
 
             aes.blockSize = reader.ReadElementContentAsInt();

@@ -34,7 +34,7 @@ namespace BSKproject
         List<string> pendingRecipents = new List<string>();
         string outputPath = "";
         string inputPath = "";
-        string loggedUser;
+        string loggedUser = "";
 
         static Random random = new Random();
         //
@@ -47,7 +47,18 @@ namespace BSKproject
             InitializeComponent();
             aes = new AES();
             aes.cipherMode = CipherMode.CBC;
+            aes.blockSize = 64;
+            radioButton_CBC.IsChecked = true;
+            blockSize64.IsChecked = true;
+            string[] directories = Directory.GetDirectories(Path.Combine(Constants.KEY_FOLDER_PATH, Constants.PUBLIC_KEY_FOLDER));
+
+            foreach (var directory in directories)
+            {
+                userList.Items.Add(Path.GetFileName(directory));
+                users.Add(Path.GetFileName(directory));
+            }
         }
+
 
         private void CBC_Checked(object sender, RoutedEventArgs e)
         {
@@ -73,9 +84,6 @@ namespace BSKproject
         {
             // Configure open file dialog box
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            //dlg.FileName = "Document"; // Default file name
-            //dlg.DefaultExt = ".txt"; // Default file extension
-            //dlg.Filter = "Text documents (.txt)|*.txt"; // Filter files by extension
 
             // Show open file dialog box
             Nullable<bool> result = dlg.ShowDialog();
@@ -85,6 +93,7 @@ namespace BSKproject
             {
                 // Open document
                 inputPath = dlg.FileName;
+                InputFileLabel.Content = inputPath;
             }
         }
 
@@ -92,9 +101,9 @@ namespace BSKproject
         {
             // Configure save file dialog box
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.FileName = "Document"; // Default file name
-            dlg.DefaultExt = ".text"; // Default file extension
-            dlg.Filter = "Text documents (.txt)|*.txt"; // Filter files by extension
+            //dlg.FileName = "Document"; // Default file name
+            //dlg.DefaultExt = ".text"; // Default file extension
+            //dlg.Filter = "Text documents (.txt)|*.txt"; // Filter files by extension
 
             // Show save file dialog box
             Nullable<bool> result = dlg.ShowDialog();
@@ -104,6 +113,7 @@ namespace BSKproject
             {
                 // Save document
                 outputPath = dlg.FileName;
+                OutputFileLabel.Content = outputPath;
             }
         }
 
@@ -124,26 +134,26 @@ namespace BSKproject
         {
             try
             {
+                string errors = "";
                 if (inputPath == "")
-                {
-                    MessageBox.Show("No input file specified", "Error", MessageBoxButton.OK);
-                }
+                    errors += "No input file specified\n";
 
                 if (outputPath == "")
-                {
-                    MessageBox.Show("No output file specified", "Error", MessageBoxButton.OK);
-                }
+                    errors += "No output file specified\n";
 
                 if (aes.cipherMode == 0)
-                {
-                    MessageBox.Show("No cipher mode specified", "Error", MessageBoxButton.OK);
-                }
+                    errors += "No cipher mode specified\n";
 
                 if (pendingRecipents == null || pendingRecipents.Count == 0)
+                    errors += "No Recipient was assigned\n";
+
+                if (errors != "")
                 {
-                    MessageBox.Show("No Recipient was assigned", "Error", MessageBoxButton.OK);
+                    MessageBox.Show(errors, "Error", MessageBoxButton.OK);
                     return;
                 }
+
+                //INITIALIZE
 
                 FileInfo info = new FileInfo(Path.GetTempFileName());
                 int randomValue;
@@ -161,12 +171,14 @@ namespace BSKproject
                     // Fill the array with a random value.
                     rngCsp.GetBytes(salt1);
                 }
-                const int Iterations = 300;
+                const int Iterations = 400;
                 var keyGenerator = new Rfc2898DeriveBytes(basePassword, salt1, Iterations);
                 aes.key = keyGenerator.GetBytes(aes.keySize);
 
                 keyGenerator = new Rfc2898DeriveBytes(basePassword.Reverse().ToString(), salt1, Iterations);
                 aes.iV = keyGenerator.GetBytes(16);
+
+                // END OF INITIALIZE
 
                 foreach (string nickname in pendingRecipents)
                 {
@@ -224,25 +236,34 @@ namespace BSKproject
 
         private void SubmitUser_Click(object sender, RoutedEventArgs e)
         {
-            RSA.GenerateKey(Login.Text, Password.Text);
+
+            using (MD5 md5Hash = MD5.Create())
+            {
+                byte[] keyPharseHash = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(Password.Text));
+                RSA.GenerateKey(Login.Text, keyPharseHash);
+            }
             userList.Items.Add(Login.Text);
             users.Add(Login.Text);
         }
 
-        private void addRecipent_Click(object sender, RoutedEventArgs e)
-        {
-            foreach (string user in users)
-            {
-                if (user == (string)userList.SelectedItem)
-                {
-                    this.pendingRecipents.Add(user);
-                }
-            }
-
-        }
-
         private async void Decypher_Click(object sender, RoutedEventArgs e)
         {
+            string errors = "";
+            if (inputPath == "")
+                errors += "No input file specified\n";
+
+            if (outputPath == "")
+                errors += "No output file specified\n";
+
+            if (loggedUser == "")
+                errors += "No logged user\n";
+
+            if (errors != "")
+            {
+                MessageBox.Show(errors, "Error", MessageBoxButton.OK);
+                return;
+            }
+
             string tempFile = System.IO.Path.GetTempFileName();
 
             using (var input = File.OpenRead(inputPath))
@@ -274,13 +295,14 @@ namespace BSKproject
                 
             using (var input = File.OpenRead(tempFile))
             {
-                using (var decryptedStream = aes.DecrypteStream(input, loggedUser, "Test"))
+                using (var decryptedStream = aes.DecrypteStream(input, loggedUser, LogInPassword.Text))
                 {
+                    if (decryptedStream == null)
+                        return;
                     using (var output = File.OpenWrite(outputPath))
                     {
                         Task copyTask = decryptedStream.CopyToAsync(output);
 
-                        //new Thread(() => StartUpdatingprogress(source, copyTask)).Start();
                         long length = input.Length;
                         do
                         {
@@ -300,12 +322,42 @@ namespace BSKproject
         private void LogIn_Click(object sender, RoutedEventArgs e)
         {
             loggedUser = LoginNickname.Text;
+            LoggedUserLabel.Content = loggedUser;
         }
 
-        private void comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void blockSize64_Checked(object sender, RoutedEventArgs e)
         {
-            ComboBoxItem typeItem = (ComboBoxItem)comboBox.SelectedItem;
-            aes.blockSize = Int32.Parse((string)typeItem.Content);
+                aes.blockSize = Int32.Parse((string)blockSize64.Content);
         }
+
+        private void blockSize128_Checked(object sender, RoutedEventArgs e)
+        {
+            aes.blockSize = Int32.Parse((string)blockSize128.Content);
+        }
+
+        private void blockSize256_Checked(object sender, RoutedEventArgs e)
+        {
+            aes.blockSize = Int32.Parse((string)blockSize256.Content);
+        }
+
+        private void removeRecipent_Click(object sender, RoutedEventArgs e)
+        {
+            pendingRecipents.Remove((string)userList.SelectedItem);
+            recipentListBox.Items.Remove((string)userList.SelectedItem);
+        }
+
+        private void addRecipent_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (string user in users)
+            {
+                if (user == (string)userList.SelectedItem)
+                {
+                    pendingRecipents.Add(user);
+                    recipentListBox.Items.Add(Login.Text);
+                }
+            }
+
+        }
+
     }
 }
