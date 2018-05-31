@@ -20,16 +20,9 @@ using Microsoft.Win32;
 
 namespace BSKproject
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
-        #region field
         AES aes;
-        /// <summary>
-        /// List of approved users.
-        /// </summary>
         List<string> users = new List<string>();
         List<string> pendingRecipents = new List<string>();
         string outputPath = "";
@@ -37,10 +30,6 @@ namespace BSKproject
         string loggedUser = "";
 
         static Random random = new Random();
-        //
-        // Summary:
-        //     Specifies the block cipher mode to use for encryption.
-        #endregion
 
         public MainWindow()
         {
@@ -50,12 +39,15 @@ namespace BSKproject
             aes.blockSize = 64;
             radioButton_CBC.IsChecked = true;
             blockSize64.IsChecked = true;
-            string[] directories = Directory.GetDirectories(Path.Combine(Constants.KEY_FOLDER_PATH, Constants.PUBLIC_KEY_FOLDER));
-
-            foreach (var directory in directories)
+            if (File.Exists(Path.Combine(Constants.KEY_FOLDER_PATH, Constants.PUBLIC_KEY_FOLDER)))
             {
-                userList.Items.Add(Path.GetFileName(directory));
-                users.Add(Path.GetFileName(directory));
+                string[] directories = Directory.GetDirectories(Path.Combine(Constants.KEY_FOLDER_PATH, Constants.PUBLIC_KEY_FOLDER));
+
+                foreach (var directory in directories)
+                {
+                    userList.Items.Add(Path.GetFileName(directory));
+                    users.Add(Path.GetFileName(directory));
+                }
             }
         }
 
@@ -176,7 +168,9 @@ namespace BSKproject
                 aes.key = keyGenerator.GetBytes(aes.keySize);
 
                 keyGenerator = new Rfc2898DeriveBytes(basePassword.Reverse().ToString(), salt1, Iterations);
-                aes.iV = keyGenerator.GetBytes(16);
+                buffer = new byte[16];
+                random.NextBytes(buffer);
+                aes.iV = buffer;
 
                 // END OF INITIALIZE
 

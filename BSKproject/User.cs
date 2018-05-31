@@ -6,15 +6,9 @@ using System.Text;
 
 namespace BSKproject
 {
-    internal class User
+     class User
     {
-        /// <summary>
-        /// Username.
-        /// </summary>
         private string name;
-        /// <summary>
-        /// Encrypted AES key by user RSA public key.
-        /// </summary>
         public byte[] key;
 
         public string Name
@@ -34,11 +28,6 @@ namespace BSKproject
             this.name = name;
         }
 
-        #region Methods
-        /// <summary>
-        /// Writes user form xml file.
-        /// </summary>
-        /// <param name="output">Opened xml file</param>
         public void WriteToXml(XmlWriter output, byte[] key)
         {
             output.WriteStartElement("User");
@@ -52,11 +41,6 @@ namespace BSKproject
             output.WriteEndElement();
         }
 
-        /// <summary>
-        /// Load config for user from xml file.
-        /// </summary>
-        /// <param name="input">Opened xml file</param>
-        /// <returns></returns>
         public static User FromXml(XmlReader input)
         {
             var user = new User();
@@ -69,23 +53,12 @@ namespace BSKproject
             return user;
         }
 
-        /// <summary>
-        /// Store key with encryption of public key
-        /// </summary>
-        /// <param name="key"></param>
-        internal void StoreKey(byte[] key)
+        public void StoreKey(byte[] key)
         {
             this.key = RSA.Encrypte(key, this.name);
         }
 
-
-
-        /// <summary>
-        /// TODO
-        /// Shows the dialog for pharse input.
-        /// </summary>
-        /// <returns></returns>
-        internal byte[] LoadKey(string keyPhrase)
+        public byte[] LoadKey(string keyPhrase)
         {
             using (MD5 md5Hash = MD5.Create())
             {
@@ -94,7 +67,5 @@ namespace BSKproject
             }
         }
 
-
-        #endregion
     }
 }
