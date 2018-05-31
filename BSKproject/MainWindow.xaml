@@ -22,10 +22,15 @@
                 <RadioButton x:Name="radioButton_CFB" Content="CFB" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="CFB_Checked"/>
                 <RadioButton x:Name="radioButton_OFB" Content="OFB" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="OFB_Checked"/>
             </MenuItem>
-            <MenuItem Header="Block size" Height="19" Width="100">
+            <MenuItem Header="Block size" Height="19" Width="61">
                 <RadioButton x:Name="blockSize64" Content="64" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="blockSize64_Checked"/>
                 <RadioButton x:Name="blockSize128" Content="128" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="blockSize128_Checked"/>
                 <RadioButton x:Name="blockSize256" Content="256" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="blockSize256_Checked"/>
+            </MenuItem>
+            <MenuItem Header="Key Size" Height="22" Width="56">
+                <RadioButton x:Name="keySize128" Content="128" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="keySize128_Checked"/>
+                <RadioButton x:Name="keySize192" Content="192" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <RadioButton x:Name="keySize256" Content="256" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             </MenuItem>
         </Menu>
         <ProgressBar Minimum="0" Maximum="100" Value="0" Name="pbStatus" Margin="10.8,87,37,280" Grid.Column="1" />

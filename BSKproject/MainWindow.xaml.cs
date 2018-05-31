@@ -37,9 +37,10 @@ namespace BSKproject
             aes = new AES();
             aes.cipherMode = CipherMode.CBC;
             aes.blockSize = 64;
+            keySize256.IsChecked = true;
             radioButton_CBC.IsChecked = true;
             blockSize64.IsChecked = true;
-            if (File.Exists(Path.Combine(Constants.KEY_FOLDER_PATH, Constants.PUBLIC_KEY_FOLDER)))
+            if (Directory.Exists(Path.Combine(Constants.KEY_FOLDER_PATH, Constants.PUBLIC_KEY_FOLDER)))
             {
                 string[] directories = Directory.GetDirectories(Path.Combine(Constants.KEY_FOLDER_PATH, Constants.PUBLIC_KEY_FOLDER));
 
@@ -353,5 +354,19 @@ namespace BSKproject
 
         }
 
+        private void keySize128_Checked(object sender, RoutedEventArgs e)
+        {
+            aes.keySize = 128 / 8;
+        }
+
+        private void keySize192_Checked(object sender, RoutedEventArgs e)
+        {
+            aes.keySize = 192 / 8;
+        }
+
+        private void keySize256_Checked(object sender, RoutedEventArgs e)
+        {
+            aes.keySize = 256 / 8;
+        }
     }
 }
