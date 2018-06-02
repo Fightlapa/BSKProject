@@ -19,16 +19,31 @@ namespace BSKproject
         public int keySize = 32;
         public List<User> recipentsList = new List<User>();
 
-        public CryptoStream EncrypteStream(Stream stream)
+        public Stream EncrypteStream(Stream stream)
         {
-            AesManaged myAes = new AesManaged();
+            RijndaelManaged myAes = new RijndaelManaged();
             myAes.Mode = cipherMode;
             myAes.IV = iV;
             myAes.Key = this.key;
 
-            ICryptoTransform encryptor = myAes.CreateEncryptor();
+            if (cipherMode != CipherMode.OFB)
+            {
+                myAes.Mode = cipherMode;
 
-            return new CryptoStream(stream, encryptor, CryptoStreamMode.Read);
+                if (cipherMode == CipherMode.CFB)
+                {
+                    myAes.FeedbackSize = 8;
+                    myAes.Padding = PaddingMode.None;
+                }
+
+                ICryptoTransform encryptor = myAes.CreateEncryptor();
+
+                return new CryptoStream(stream, encryptor, CryptoStreamMode.Read);
+            }
+            else
+            {
+                return new OFBStream(stream, myAes, CryptoStreamMode.Read);
+            }
         }
 
         public CryptoStream EncrypteStream(Stream stream, byte[] password)
@@ -44,9 +59,9 @@ namespace BSKproject
             return new CryptoStream(stream, encryptor, CryptoStreamMode.Write);
         }
 
-        public CryptoStream DecrypteStream(Stream stream, string login, string keyPharse)
+        public Stream DecrypteStream(Stream stream, string login, string keyPharse)
         {
-            AesManaged myAes = new AesManaged();
+            RijndaelManaged myAes = new RijndaelManaged();
             myAes.Mode = cipherMode;
             myAes.IV = iV;
             var user = (from u in recipentsList
@@ -64,9 +79,24 @@ namespace BSKproject
             }
             myAes.Key = aesKey;
 
-            ICryptoTransform decryptor = myAes.CreateDecryptor();
+            if (cipherMode != CipherMode.OFB)
+            {
 
-            return new CryptoStream(stream, decryptor, CryptoStreamMode.Read);
+                myAes.Mode = cipherMode;
+                if (cipherMode == CipherMode.CFB)
+                {
+                    myAes.FeedbackSize = 8;
+                    myAes.Padding = PaddingMode.None;
+                }
+
+                ICryptoTransform decryptor = myAes.CreateDecryptor();
+
+                return new CryptoStream(stream, decryptor, CryptoStreamMode.Read);
+            }
+            else
+            {
+                return new OFBStream(stream, myAes, CryptoStreamMode.Read);
+            }
         }
 
         public CryptoStream DecrypteStream(Stream stream, byte[] password)

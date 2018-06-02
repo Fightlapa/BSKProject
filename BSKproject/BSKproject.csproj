@@ -57,8 +57,10 @@
     </ApplicationDefinition>
     <Compile Include="AES.cs" />
     <Compile Include="FilesManager.cs" />
+    <Compile Include="OFBStream.cs" />
     <Compile Include="RSA.cs" />
     <Compile Include="User.cs" />
+    <Compile Include="ZeroStream.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
