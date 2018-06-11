@@ -13,8 +13,8 @@
         </Grid.ColumnDefinitions>
         <Menu x:Name="menu" HorizontalAlignment="Left" Height="22" VerticalAlignment="Top" Width="594" Grid.ColumnSpan="2">
             <MenuItem Header="_File" Click="MenuItem_Click">
-                <MenuItem Header="_Open" Click="MenuItem_Open_Click" />
-                <MenuItem Header="_Choose Output Directory" Click="MenuItem_Choose_Click" />
+                <MenuItem Header="_Open Input File" Click="MenuItem_Open_Click" />
+                <MenuItem Header="_Define Output File" Click="MenuItem_Choose_Click" />
             </MenuItem>
             <MenuItem Header="_Mode">
                 <RadioButton x:Name="radioButton_ECB" Content="ECB" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="ECB_Checked"/>
